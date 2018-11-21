@@ -11,7 +11,6 @@ jobs:
       file: ci/build.yml
       params:
         DOMAIN: system.g.cld.gov.au
-        PASSWORD: ((g-password))
     - put: g-cf
       params:
         manifest: build/manifest.yml
