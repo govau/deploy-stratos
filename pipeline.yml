@@ -18,7 +18,7 @@ jobs:
         - put: g-cf
           params:
             manifest: g-build/manifest.yml
-            path: src
+            path: g-build/src
             current_app_name: stratos
       - do:
         - task: build
@@ -30,7 +30,7 @@ jobs:
         - put: d-cf
           params:
             manifest: d-build/manifest.yml
-            path: src
+            path: d-build/src
             current_app_name: stratos
     on_success:
       put: slack
@@ -61,7 +61,7 @@ jobs:
     - put: y-cf
       params:
         manifest: build/manifest.yml
-        path: src
+        path: build/src
         current_app_name: stratos
     on_success:
       put: slack
@@ -92,7 +92,7 @@ jobs:
     - put: b-cf
       params:
         manifest: build/manifest.yml
-        path: src
+        path: build/src
         current_app_name: stratos
     on_success:
       put: slack
