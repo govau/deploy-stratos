@@ -7,6 +7,7 @@ ORIG_PWD="${PWD}"
 
 cp -R "${ORIG_PWD}/src" "${ORIG_PWD}/build/src"
 cd "${ORIG_PWD}/build/src"
+./build/store-git-metadata.sh
 npm install
 npm run prebuild-ui
 
