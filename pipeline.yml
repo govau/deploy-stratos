@@ -1,17 +1,95 @@
 ---
 jobs:
-- name: stratos-g
+- name: stratos-dg
   serial: true
   plan:
   - do:
     - get: ci
       trigger: true
     - get: src
+    - aggregate:
+      - do:
+        - task: build
+          file: ci/build.yml
+          params:
+            DOMAIN: system.g.cld.gov.au
+          output_mapping:
+            build: g-build
+        - put: g-cf
+          params:
+            manifest: g-build/manifest.yml
+            path: src
+            current_app_name: stratos
+      - do:
+        - task: build
+          file: ci/build.yml
+          params:
+            DOMAIN: system.d.cld.gov.au
+          output_mapping:
+            build: d-build
+        - put: d-cf
+          params:
+            manifest: d-build/manifest.yml
+            path: src
+            current_app_name: stratos
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: stratos-y
+  serial: true
+  plan:
+  - do:
+    - get: ci
+      passed:
+      - stratos-dg
+    - get: src
+      passed:
+      - stratos-dg
     - task: build
       file: ci/build.yml
       params:
-        DOMAIN: system.g.cld.gov.au
-    - put: g-cf
+        DOMAIN: system.y.cld.gov.au
+    - put: y-cf
+      params:
+        manifest: build/manifest.yml
+        path: src
+        current_app_name: stratos
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: $BUILD_JOB_NAME SUCCESS
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: $BUILD_JOB_NAME FAILED
+          <$ATC_EXTERNAL_URL/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+- name: stratos-b
+  serial: true
+  plan:
+  - do:
+    - get: ci
+      passed:
+      - stratos-y
+    - get: src
+      passed:
+      - stratos-y
+    - task: build
+      file: ci/build.yml
+      params:
+        DOMAIN: system.b.cld.gov.au
+    - put: b-cf
       params:
         manifest: build/manifest.yml
         path: src
@@ -45,6 +123,30 @@ resources:
     api: https://api.system.g.cld.gov.au
     username: ci-system-stratos
     password: ((g-password))
+    organization: system
+    space: stratos
+- name: d-cf
+  type: cf
+  source:
+    api: https://api.system.d.cld.gov.au
+    username: ci-system-stratos
+    password: ((d-password))
+    organization: system
+    space: stratos
+- name: y-cf
+  type: cf
+  source:
+    api: https://api.system.y.cld.gov.au
+    username: ci-system-stratos
+    password: ((y-password))
+    organization: system
+    space: stratos
+- name: b-cf
+  type: cf
+  source:
+    api: https://api.system.b.cld.gov.au
+    username: ci-system-stratos
+    password: ((b-password))
     organization: system
     space: stratos
 - name: slack
