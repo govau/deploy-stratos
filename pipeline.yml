@@ -15,7 +15,7 @@ jobs:
     - put: g-cf
       params:
         manifest: build/manifest.yml
-        path: build
+        path: src
         current_app_name: stratos
     on_success:
       put: slack
