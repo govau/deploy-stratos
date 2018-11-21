@@ -1,0 +1,10 @@
+applications:
+- name: stratos
+  memory: 1512M
+  disk_quota: 1024M
+  host: stratos
+  timeout: 180
+  buildpack: stratos-buildpack
+  health-check-type: port
+  services:
+  - stratos-properties
