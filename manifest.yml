@@ -6,5 +6,7 @@ applications:
   timeout: 180
   buildpack: stratos-buildpack
   health-check-type: port
+  env:
+    CF_UPS_NAME: stratos-ups
   services:
-  - stratos-properties
+  - stratos-ups
